@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<meta charset="utf-8"> 
+<title>菜鸟教程(runoob.com)</title> 
+</head>
+<body>
+
+<canvas id="myCanvas" width="1200" height="600" style="border:1px solid #c3c3c3;">
+您的浏览器不支持 HTML5 canvas 标签。
+</canvas>
+<button onclick="stop()">停止</button>
+<button onclick="start()">启动</button>
+
+<script>
+var state;
+var solders=[];
+var bullets=[];
+var word={
+    hitBack:true,
+    height:600,
+    width:1200,
+}
+
+
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+ctx.fillStyle="#FF0000";
+initSolder();
+initBullet();
+// ctx.fillRect(0,0,200,200);    
+
+
+
+
+function stop(){
+    clearInterval(state)
+    state=0;
+}
+function start(){
+    if(state >= 1 ) return
+    state=setInterval('update()',25);
+}
+
+function update(){
+    wordMove();
+    collisionCheck();
+    draw();
+}
+
+function wordMove(){
+    for(let i=0;i<solders.length;i++){
+        let s=solders[i];
+        s.move();
+        if(word.hitBack && s.y<0 || s.y>word.height) s.dy=s.dy*-1;
+        if(word.hitBack && s.x<0 || s.x>word.width) s.dx=s.dx*-1;
+    }
+    for(let i=0;i<bullets.length;i++){
+        let b=bullets[i];
+        b.move();
+        if(word.hitBack && b.y<0 || b.y>word.height) b.dy=b.dy*-1;
+        if(word.hitBack && b.x<0 || b.x>word.width) b.dx=b.dx*-1;
+    }
+}
+
+function collisionCheck(){
+    for(let i=0;i<solders.length;i++){
+        for(let j=0;j<bullets.length;j++){
+            let s=solders[i];
+            let b=bullets[j];
+            if((s.x-b.x)**2+(s.y-b.y)**2 < s.size**2){
+                solders.splice(i,1);
+                // bullets.splice(j,1);
+            }
+        }
+    }
+}
+
+function draw(){
+    c.height=c.height;
+    ctx.font="20px Arial";
+    ctx.strokeText("state : "+state,1100,20); 
+    ctx.strokeText("solder : "+solders.length,1100,40); 
+    ctx.strokeText("bullet : "+bullets.length,1100,60); 
+    for(let i=0;i<solders.length;i++){
+        let s=solders[i];
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.size,0,2*Math.PI);
+        ctx.stroke();
+        ctx.fill();
+    }
+    for(let i=0;i<bullets.length;i++){
+        let b=bullets[i];
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,b.size,0,2*Math.PI);
+        ctx.stroke();
+        ctx.fill();
+    }
+}
+
+// state=setInterval("draw()",50);
+function initSolder(){
+    // var s=newSolder(200,200,-1,-5);
+    // solders.push(s);
+    let num=Math.ceil(Math.random()*100);
+    for(let i=1;i<num;i++){
+        let s=newSolder(Math.ceil(Math.random()*1200),Math.ceil(Math.random()*600),
+        Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
+        solders.push(s);
+    }
+}
+function initBullet(){
+    var b=newBullet();
+    bullets.push(b);
+    let num=Math.ceil(Math.random()*100);
+    for(let i=1;i<num;i++){
+        let b=newBullet(Math.ceil(Math.random()*1200),Math.ceil(Math.random()*600),
+        Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
+        bullets.push(b);
+    }
+}
+
+function newSolder(x=0,y=0,dx=10,dy=10){
+    var solder={};
+    solder.x=x;
+    solder.y=y;
+    solder.dx=dx;
+    solder.dy=dy;
+    solder.size=10;
+    solder.move=function(){
+        this.x=this.x+this.dx;
+        this.y=this.y+this.dy;
+    }
+    solder.moveTo=function(x,y){
+        this.x=x;
+        this.y=y;
+    }
+    return solder;
+}
+
+function newBullet(x=0,y=0,dx=10,dy=10){
+    var bullet={};
+    bullet.x=x;
+    bullet.y=y;
+    bullet.dx=dx;
+    bullet.dy=dy;
+    bullet.size=3;
+    bullet.move=function(){
+        this.x=this.x+this.dx;
+        this.y=this.y+this.dy;
+    }
+    return bullet;
+}
+
+</script>
+
+</body>
+</html>
